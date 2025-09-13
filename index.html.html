@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKD Cricket Team Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Screen -->
+    <div id="main-screen" class="screen">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <h1>🏏 BKD Cricket Teams</h1>
+                    <div class="header-actions">
+                        <div class="database-status">
+                            <span class="status-indicator"></span>
+                            <span>Firebase Connected</span>
+                        </div>
+                        <button id="admin-toggle" class="btn btn--outline">Admin</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div class="container">
+            <nav class="dashboard-nav">
+                <button class="nav-btn" data-section="players">👥 Players</button>
+                <button class="nav-btn" data-section="guests">🆔 Guests</button>
+                <button class="nav-btn" data-section="teams">⚡ Teams</button>
+                <button class="nav-btn admin-only" data-section="admin">⚙️ Admin</button>
+            </nav>
+
+            <!-- Players Section -->
+            <section id="players-section" class="dashboard-section">
+                <div class="section-header">
+                    <div>
+                        <h2>Player Selection</h2>
+                        <div class="player-stats">
+                            <span class="stat-item">Available: <span id="available-count">0</span></span>
+                            <span class="stat-item">Total: <span id="total-count">0</span></span>
+                            <span class="stat-item">Guests: <span id="guest-count">0</span></span>
+                        </div>
+                    </div>
+                    <button id="generate-teams-btn" class="btn btn--primary">⚡ Generate Teams</button>
+                </div>
+                
+                <div id="player-selection-grid" class="player-selection-grid">
+                    <div class="loading-message">Loading players...</div>
+                </div>
+            </section>
+
+            <!-- Guests Section -->
+            <section id="guests-section" class="dashboard-section hidden">
+                <div class="section-header">
+                    <h2>Guest Players</h2>
+                    <button id="add-guest-btn" class="btn btn--primary">+ Add Guest Player</button>
+                </div>
+                
+                <div class="guest-info">
+                    <p><strong>Note:</strong> Guest players are temporary for today only and won't be saved to the database. They get default ranking for team balancing.</p>
+                </div>
+
+                <div id="guest-players-list" class="guest-players-list">
+                    <p class="no-guests">No guest players added yet. Click "Add Guest Player" to add temporary players for today's match.</p>
+                </div>
+            </section>
+
+            <!-- Teams Section -->
+            <section id="teams-section" class="dashboard-section hidden">
+                <div class="section-header">
+                    <h2>Generated Teams</h2>
+                    <div class="team-actions">
+                        <button id="regenerate-teams-btn" class="btn btn--outline">🔄 Regenerate</button>
+                        <button id="generate-teams-btn" class="btn btn--primary">⚡ Generate Teams</button>
+                    </div>
+                </div>
+
+                <!-- Toss Section (NEW) -->
+                <div id="toss-section" class="toss-section" style="display: none;">
+                    <div class="toss-container">
+                        <div class="toss-header">
+                            <h3>🪙 Coin Toss</h3>
+                        </div>
+                        <div id="toss-controls" class="toss-controls">
+                            <!-- Toss controls will be rendered here -->
+                        </div>
+                        <div id="toss-result" class="toss-result">
+                            <!-- Toss results will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="teams-container">
+                    <!-- Team A -->
+                    <div class="team-card">
+                        <h3>Team A <span id="team-a-count" class="team-count-badge">(0 players)</span></h3>
+                        <div id="team-a-players" class="team-players">
+                            <p class="no-teams">Select available players and click "Generate Teams" to create balanced teams</p>
+                        </div>
+                    </div>
+
+                    <!-- Team B -->
+                    <div class="team-card">
+                        <h3>Team B <span id="team-b-count" class="team-count-badge">(0 players)</span></h3>
+                        <div id="team-b-players" class="team-players">
+                            <p class="no-teams">Select available players and click "Generate Teams" to create balanced teams</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Balance Info -->
+                <div id="team-balance-info" class="team-balance-info">
+                    <div class="card balance-summary">
+                        <div class="card__body">
+                            <h4>Team Balance Analysis</h4>
+                            <div class="balance-stats">
+                                <div class="balance-stat">
+                                    <span class="balance-label">Team A Average:</span>
+                                    <span id="team-a-avg" class="balance-value">0.0</span>
+                                </div>
+                                <div class="balance-stat">
+                                    <span class="balance-label">Team B Average:</span>
+                                    <span id="team-b-avg" class="balance-value">0.0</span>
+                                </div>
+                                <div class="balance-stat">
+                                    <span class="balance-label">Difference:</span>
+                                    <span id="balance-difference" class="balance-value">0.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin-section" class="dashboard-section admin-only hidden">
+                <div class="section-header">
+                    <h2>Admin Panel</h2>
+                    <button id="add-permanent-player-btn" class="btn btn--primary">+ Add Permanent Player</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Ranking</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-players-table-body">
+                            <!-- Players will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Admin Login</h3>
+                <button id="close-admin-login" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label for="admin-username" class="form-label">Username</label>
+                        <input type="text" id="admin-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password" class="form-label">Password</label>
+                        <input type="password" id="admin-password" class="form-control" required>
+                    </div>
+                    <div id="admin-login-error" class="error-message hidden"></div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancel-admin-login" class="btn btn--outline">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guest Player Modal -->
+    <div id="guest-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Guest Player</h3>
+                <button id="close-guest-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="guest-form">
+                    <div class="form-group">
+                        <label for="guest-name" class="form-label">Player Name</label>
+                        <input type="text" id="guest-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-role" class="form-label">Role</label>
+                        <select id="guest-role" class="form-control">
+                            <option value="Allrounder">Allrounder</option>
+                            <option value="Batter">Batter</option>
+                            <option value="Bowler">Bowler</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-ranking" class="form-label">Ranking (1-100)</label>
+                        <input type="number" id="guest-ranking" class="form-control" min="1" max="100" value="50">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancel-guest" class="btn btn--outline">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Add Player</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permanent Player Modal -->
+    <div id="permanent-player-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Permanent Player</h3>
+                <button id="close-permanent-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="permanent-player-form">
+                    <div class="form-group">
+                        <label for="permanent-name" class="form-label">Player Name</label>
+                        <input type="text" id="permanent-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="permanent-role" class="form-label">Role</label>
+                        <select id="permanent-role" class="form-control">
+                            <option value="Allrounder">Allrounder</option>
+                            <option value="Batter">Batter</option>
+                            <option value="Bowler">Bowler</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="permanent-ranking" class="form-label">Ranking (1-100)</label>
+                        <input type="number" id="permanent-ranking" class="form-control" min="1" max="100" value="50">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancel-permanent" class="btn btn--outline">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Save Player</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p id="loading-message">Creating balanced teams...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
